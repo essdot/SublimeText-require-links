@@ -6,14 +6,26 @@ import subprocess
 import os
 
 
+def get_node_path():
+    node_path_yargs = ['which', 'node']
+    node_path = subprocess.check_output(node_path_yargs)
+
+    return node_path.strip()
+
+
 def open_require(view, requirePath):
+    node_path = get_node_path()
+
+    if not node_path:
+        return
+
     js = (
         "try {"
         "  var resolved = require.resolve('" + requirePath + "');"
         "  process.stdout.write(resolved);"
         "} catch () {}"
     )
-    yargs = ['/usr/local/bin/node', '-e', js]
+    yargs = [node_path, '-e', js]
     working_dir = os.path.dirname(os.path.realpath(view.file_name()))
 
     file_name = subprocess.check_output(yargs, cwd=working_dir)
