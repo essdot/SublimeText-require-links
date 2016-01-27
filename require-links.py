@@ -69,9 +69,6 @@ class UrlHighlighter(sublime_plugin.EventListener):
     ignored_views = []
     highlight_semaphore = threading.Semaphore()
 
-    # def onPostSave(self, view):
-    #     print("just got saved")
-
     def on_activated(self, view):
         self.update_url_highlights(view)
 
