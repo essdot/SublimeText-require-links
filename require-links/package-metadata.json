@@ -1,10 +1,8 @@
 {
   "sublime_text": "*",
   "dependencies": [],
-  "platforms": [
-    "*"
-  ],
+  "platforms": ["*"],
   "description": "Makes require paths clickable",
-  "url": "",
+  "url": "https://github.com/essdot/SublimeText-require-links",
   "version": "0.0.1"
 }
