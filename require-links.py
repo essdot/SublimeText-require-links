@@ -41,6 +41,9 @@ class OpenRequire(sublime_plugin.TextCommand):
         if 'JavaScript' not in syntax:
             return
 
+        if not self.view.file_name():
+            return
+
         if self.view.id() in UrlHighlighter.urls_for_view:
             selection = self.view.sel()[0]
             if selection.empty():
@@ -97,8 +100,9 @@ class UrlHighlighter(sublime_plugin.EventListener):
 
     def should_highlight(self, view):
         syntax = view.settings().get('syntax')
+        view_file_name = view.file_name()
 
-        return 'JavaScript' in syntax
+        return 'JavaScript' in syntax and view_file_name
 
     """The logic entry point. Find all URLs in view, store & highlight them"""
     def update_url_highlights(self, view):
