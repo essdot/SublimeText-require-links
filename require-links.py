@@ -12,30 +12,42 @@ def get_node_path():
     ).get('node_path', '/usr/local/bin/node')
 
 
-def open_require(view, requirePath):
+def resolve_require_path(context_file_path, require_path):
     node_path = get_node_path()
 
     js = (
         "try {"
-        "  var resolved = require.resolve('" + requirePath + "');"
+        "  var resolved = require.resolve('" + require_path + "');"
         "  process.stdout.write(resolved);"
         "} catch (e) {}"
     )
     yargs = [node_path, '-e', js]
-    working_dir = os.path.dirname(os.path.realpath(view.file_name()))
+    working_dir = os.path.dirname(os.path.realpath(context_file_path))
 
     file_name = subprocess.check_output(yargs, cwd=working_dir)
     file_name = file_name.decode('utf-8').strip()
 
-    if file_name and os.path.isfile(file_name):
-        view.window().open_file(file_name)
+    return file_name
+
+
+def open_require(view, require_path):
+    resolved_path = resolve_require_path(view.file_name(), require_path)
+
+    if resolved_path and os.path.isfile(resolved_path):
+        view.window().open_file(resolved_path)
 
 
 class OpenRequire(sublime_plugin.TextCommand):
     def is_visible(self):
         return False
 
-    def run(self, edit):
+    def want_event(self):
+        return True
+
+    def run(self, edit, event):
+        if self.view.id() not in UrlHighlighter.urls_for_view:
+            return
+
         syntax = self.view.settings().get('syntax')
 
         if 'JavaScript' not in syntax:
@@ -44,19 +56,20 @@ class OpenRequire(sublime_plugin.TextCommand):
         if not self.view.file_name():
             return
 
-        if self.view.id() in UrlHighlighter.urls_for_view:
-            selection = self.view.sel()[0]
-            if selection.empty():
-                selection = next(
-                    (
-                        url for url
-                        in UrlHighlighter.urls_for_view[self.view.id()]
-                        if url.contains(selection)
-                    ), None)
-                if not selection:
-                    return
-            requirePath = self.view.substr(selection)
-            open_require(self.view, requirePath)
+        point = self.view.window_to_text((event['x'], event['y']))
+
+        selection = next(
+            (
+                url for url
+                in UrlHighlighter.urls_for_view[self.view.id()]
+                if url.contains(point)
+            ), None)
+
+        if not selection:
+            return
+
+        require_path = self.view.substr(selection)
+        open_require(self.view, require_path)
 
 
 class UrlHighlighter(sublime_plugin.EventListener):
@@ -127,6 +140,10 @@ class UrlHighlighter(sublime_plugin.EventListener):
         UrlHighlighter.urls_for_view[view.id()] = fixed_urls
         self.highlight_urls(view, fixed_urls)
 
+    # The main regex & find_all call matches
+    # regions like "require('whatever')".
+    # This method narrows the region to just
+    # the part in between quotes
     def calculate_region(self, view, region):
         pattern = "(require\\(['\"])([^']*)['\"]\\)"
         str_value = view.substr(region)
