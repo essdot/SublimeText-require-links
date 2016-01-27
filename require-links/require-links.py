@@ -7,7 +7,12 @@ import os
 
 
 def open_require(view, requirePath):
-    js = "process.stdout.write(require.resolve('" + requirePath + "'))"
+    js = (
+        "try {"
+        "  var resolved = require.resolve('" + requirePath + "');"
+        "  process.stdout.write(resolved);"
+        "} catch () {}"
+    )
     yargs = ['/usr/local/bin/node', '-e', js]
     working_dir = os.path.dirname(os.path.realpath(view.file_name()))
 
