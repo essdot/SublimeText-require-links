@@ -1,0 +1,10 @@
+{
+  "sublime_text": "*",
+  "dependencies": [],
+  "platforms": [
+    "*"
+  ],
+  "description": "Makes require paths clickable",
+  "url": "",
+  "version": "0.0.1"
+}
