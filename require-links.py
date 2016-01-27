@@ -7,23 +7,19 @@ import os
 
 
 def get_node_path():
-    node_path_yargs = ['which', 'node']
-    node_path = subprocess.check_output(node_path_yargs)
-
-    return node_path.strip()
+    return sublime.load_settings(
+        "require-links.sublime-settings"
+    ).get('node_path', '/usr/local/bin/node')
 
 
 def open_require(view, requirePath):
     node_path = get_node_path()
 
-    if not node_path:
-        return
-
     js = (
         "try {"
         "  var resolved = require.resolve('" + requirePath + "');"
         "  process.stdout.write(resolved);"
-        "} catch () {}"
+        "} catch (e) {}"
     )
     yargs = [node_path, '-e', js]
     working_dir = os.path.dirname(os.path.realpath(view.file_name()))
