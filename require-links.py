@@ -60,7 +60,7 @@ class OpenRequire(sublime_plugin.TextCommand):
 
 
 class UrlHighlighter(sublime_plugin.EventListener):
-    URL_REGEX = "require\\('[^']*'\\)"
+    URL_REGEX = "require\\(['\"][^'\"]*['\"]\\)"
     DEFAULT_MAX_URLS = 200
     SETTINGS_FILENAME = 'require-links.sublime-settings'
 
@@ -128,7 +128,7 @@ class UrlHighlighter(sublime_plugin.EventListener):
         self.highlight_urls(view, fixed_urls)
 
     def calculate_region(self, view, region):
-        pattern = "(require\\(')([^']*)'\\)"
+        pattern = "(require\\(['\"])([^']*)['\"]\\)"
         str_value = view.substr(region)
         match = re.match(pattern, str_value)
         left_group = match.groups()[0]
