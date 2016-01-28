@@ -217,6 +217,6 @@ class UrlHighlighter(sublime_plugin.EventListener):
         if old_scopes:
             unused_scopes = set(old_scopes) - set(new_scopes)
             for unused_scope_name in unused_scopes:
-                view.erase_regions(u'clickable-urls ' + unused_scope_name)
+                view.erase_regions(u'require-links ' + unused_scope_name)
 
         UrlHighlighter.scopes_for_view[view.id()] = new_scopes
