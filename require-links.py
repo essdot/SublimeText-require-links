@@ -17,11 +17,12 @@ def resolve_require_path(context_file_path, require_path):
 
     js = (
         "try {"
-        "  var resolved = require.resolve('" + require_path + "');"
+        "  var requirePath = process.argv[1];"
+        "  var resolved = require.resolve(requirePath);"
         "  process.stdout.write(resolved);"
         "} catch (e) {}"
     )
-    yargs = [node_path, '-e', js]
+    yargs = [node_path, '-e', js, require_path]
     working_dir = os.path.dirname(os.path.realpath(context_file_path))
 
     file_name = subprocess.check_output(yargs, cwd=working_dir)
