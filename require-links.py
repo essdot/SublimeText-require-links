@@ -114,14 +114,24 @@ class UrlHighlighter(sublime_plugin.EventListener):
 
     def should_highlight(self, view):
         syntax = view.settings().get('syntax')
-        view_file_name = view.file_name()
 
-        return 'JavaScript' in syntax and view_file_name
+        if 'JavaScript' not in syntax:
+            return False
+
+        view_file = view.file_name()
+
+        if not os.path.exists(view_file) or not os.path.isfile(view_file):
+            return False
+
+        view_file_dir = os.path.dirname(os.path.realpath(view_file))
+
+        return os.path.exists(view_file_dir) and os.path.isdir(view_file_dir)
 
     """The logic entry point. Find all URLs in view, store & highlight them"""
     def update_url_highlights(self, view):
 
         if not self.should_highlight(view):
+            self.clear_scopes(view)
             return
 
         max_url_limit = 200
@@ -224,3 +234,12 @@ class UrlHighlighter(sublime_plugin.EventListener):
                 view.erase_regions(u'require-links ' + unused_scope_name)
 
         UrlHighlighter.scopes_for_view[view.id()] = new_scopes
+
+    def clear_scopes(self, view):
+        scopes = UrlHighlighter.scopes_for_view.get(view.id(), None)
+
+        if not scopes:
+            return
+
+        for scope_name in scopes:
+            view.erase_regions(u'require-links ' + scope_name)
