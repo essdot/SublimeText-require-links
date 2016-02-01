@@ -6,6 +6,9 @@ import subprocess
 import os
 
 
+SCOPE_PREFIX = u'require-links '
+
+
 def get_node_path():
     return sublime.load_settings(
         "require-links.sublime-settings"
@@ -206,7 +209,7 @@ class UrlHighlighter(sublime_plugin.EventListener):
                 sublime.DRAW_SOLID_UNDERLINE
             )
             view.add_regions(
-                u'require-links ' + scope_name,
+                SCOPE_PREFIX + scope_name,
                 regions,
                 scope_name,
                 flags=flags
@@ -219,7 +222,7 @@ class UrlHighlighter(sublime_plugin.EventListener):
                 for pos in range(region.a, region.b)
             ]
             view.add_regions(
-                u'require-links ' + scope_name,
+                SCOPE_PREFIX + scope_name,
                 char_regions,
                 scope_name,
                 sublime.DRAW_EMPTY_AS_OVERWRITE)
@@ -231,7 +234,7 @@ class UrlHighlighter(sublime_plugin.EventListener):
         if old_scopes:
             unused_scopes = set(old_scopes) - set(new_scopes)
             for unused_scope_name in unused_scopes:
-                view.erase_regions(u'require-links ' + unused_scope_name)
+                view.erase_regions(SCOPE_PREFIX + unused_scope_name)
 
         UrlHighlighter.scopes_for_view[view.id()] = new_scopes
 
@@ -242,4 +245,4 @@ class UrlHighlighter(sublime_plugin.EventListener):
             return
 
         for scope_name in scopes:
-            view.erase_regions(u'require-links ' + scope_name)
+            view.erase_regions(SCOPE_PREFIX + scope_name)
