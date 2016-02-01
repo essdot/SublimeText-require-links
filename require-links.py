@@ -25,6 +25,9 @@ def resolve_require_path(context_file_path, require_path):
     yargs = [node_path, '-e', js, require_path]
     working_dir = os.path.dirname(os.path.realpath(context_file_path))
 
+    if not os.path.exists(working_dir) or not os.path.isdir(working_dir):
+        return None
+
     file_name = subprocess.check_output(yargs, cwd=working_dir)
     file_name = file_name.decode('utf-8').strip()
 
