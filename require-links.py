@@ -123,7 +123,7 @@ class UrlHighlighter(sublime_plugin.EventListener):
 
         view_file = view.file_name()
 
-        if not os.path.exists(view_file) or not os.path.isfile(view_file):
+        if not view_file or not os.path.isfile(view_file):
             return False
 
         view_file_dir = os.path.dirname(os.path.realpath(view_file))
